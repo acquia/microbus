@@ -2,12 +2,14 @@ require 'bundler/gem_helper'
 require 'rake'
 require 'rake/tasklib'
 
+require_relative 'docker'
+
 module Microbus
   # Provides a custom rake task.
-  class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
+  class RakeTask < Rake::TaskLib
     Options = Struct.new(:build_path, :deployment_path, :docker_path,
-                         :docker_image, :filename, :files, :gem_helper,
-                         :smoke_test_cmd) do
+                         :docker_cache, :docker_image, :filename, :files,
+                         :gem_helper, :smoke_test_cmd) do
       class << self
         private :new
 
@@ -47,16 +49,23 @@ module Microbus
       task @name => ["#{@name}:build"]
     end
 
-    def declare_build_task
-      desc "Build #{gem_name} tarball"
+    def declare_build_task # rubocop:disable MethodLength, AbcSize
+      desc "Build #{@gem_helper.gemspec.name} tarball"
       task :build do
         Rake::Task["#{@name}:clean"].invoke(false)
 
         # Copy only files declared in gemspec.
         sh("rsync -R #{opts.files.join(' ')} build")
 
-        check_docker
-        build_docker_image
+        docker = Docker.new(
+          path: opts.docker_path,
+          tag: opts.docker_image,
+          work_dir: opts.deployment_path,
+          local_dir: opts.build_path,
+          cache_dir: opts.docker_cache
+        )
+
+        docker.prepare
 
         Dir.chdir(opts.build_path) do
           Bundler.with_clean_env do
@@ -70,19 +79,12 @@ module Microbus
             # bundle install to prune.
             sh('rm .bundle/config')
 
-            # Gather uid and gid so we can match file ownership on Linux hosts.
-            gid = Process::Sys.getegid
-            uid = Process::Sys.geteuid
-
-            cmds = [
-              # Create a user that matches the current user's UID and GID.
-              "groupadd -f -g #{gid} dgroup",
-              "useradd -u #{uid} -g dgroup duser",
-              # @note don't use --deployment because bundler may package OS
-              # specific gems, so we allow bundler to fetch alternatives while
-              # running in docker if need be.
-              # @todo When https://github.com/bundler/bundler/issues/4144
-              # is released, --jobs can be increased.
+            # @note don't use --deployment because bundler may package OS
+            # specific gems, so we allow bundler to fetch alternatives while
+            # running in docker if need be.
+            # @todo When https://github.com/bundler/bundler/issues/4144
+            # is released, --jobs can be increased.
+            cmd =
               'bundle install' \
               ' --jobs 1' \
               ' --path vendor/bundle' \
@@ -90,23 +92,11 @@ module Microbus
               ' --binstubs binstubs' \
               ' --without development' \
               ' --clean' \
-              ' --frozen',
-              # chown all outputs to that user before we return, so that build
-              # can be accessed as unprivileged user on Linux.
-              "chown -R duser:dgroup #{opts.deployment_path}"
-            ]
+              ' --frozen'
 
-            cmds << "binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
+            cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
 
-            # Run everything in Docker.
-            sh('docker run' \
-              " --name #{gem_name}-build" \
-              ' --interactive=false' \
-              ' --rm' \
-              " --volume \"$PWD\":#{opts.deployment_path}" \
-              " --workdir #{opts.deployment_path}" \
-              " #{opts.docker_image}" \
-              " bash -l -c '#{cmds.join(' && ')}'")
+            docker.run(cmd)
           end
 
           # Make it a tarball - note we exclude lots of redundant files, caches
@@ -122,11 +112,13 @@ module Microbus
             " -czf ../#{opts.filename} *")
 
           puts "Created #{opts.filename}"
+
+          docker.teardown
         end
       end
     end
 
-    def declare_clean_task
+    def declare_clean_task # rubocop:disable MethodLength, AbcSize
       desc 'Clean build artifacts'
       task :clean, :nuke, :tarball do |_t, args|
         args.with_defaults(nuke: true, tarball: opts.filename)
@@ -139,32 +131,10 @@ module Microbus
           fl.exclude('build/vendor/**/*')
         end
         clean_files << args[:tarball]
-        clean_files << "#{root}/build/" if args[:nuke]
+        clean_files << "#{@gem_helper.base}/build/" if args[:nuke]
 
         FileUtils.rm_rf(clean_files)
       end
-    end
-
-    def check_docker
-      # Check for docker
-      unless system('docker info > /dev/null')
-        puts 'Docker is not installed or unavailable.'
-        exit 1
-      end
-    end
-
-    def build_docker_image
-      # Use docker to install, building native extensions on an OS similar to
-      # our deployment environment.
-      sh("docker build -t #{opts.docker_image} #{opts.docker_path}/.")
-    end
-
-    def gem_name
-      @gem_helper.gemspec.name
-    end
-
-    def root
-      @gem_helper.base
     end
 
     # Lazily define opts so we don't slow down other rake tasks.
