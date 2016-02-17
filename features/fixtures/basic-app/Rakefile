@@ -1,0 +1,7 @@
+require 'bundler/setup'
+require 'microbus/rake_task'
+
+# Deployment build tasks.
+Microbus::RakeTask.new(:build) do |opts|
+  opts.smoke_test_cmd = 'sequel --help'
+end

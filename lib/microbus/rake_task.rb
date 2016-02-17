@@ -4,7 +4,7 @@ require 'rake/tasklib'
 
 module Microbus
   # Provides a custom rake task.
-  class RakeTask < Rake::TaskLib
+  class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
     Options = Struct.new(:build_path, :deployment_path, :docker_path,
                          :docker_image, :filename, :files, :gem_helper,
                          :smoke_test_cmd) do
@@ -120,6 +120,8 @@ module Microbus
             ' --exclude="vendor/bundle/ruby/*[0-9]/extensions/"' \
             ' --exclude="vendor/cache/extensions/"' \
             " -czf ../#{opts.filename} *")
+
+          puts "Created #{opts.filename}"
         end
       end
     end

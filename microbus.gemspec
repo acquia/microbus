@@ -16,7 +16,11 @@ Gem::Specification.new do |s|
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
 
-  s.add_development_dependency 'bundler', '~> 1.11'
+  s.add_dependency 'bundler'
+
+  s.add_development_dependency 'aruba', '~> 0.13'
+  s.add_development_dependency 'cucumber'
   s.add_development_dependency 'rake', '~> 10.0'
+  s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop'
 end
