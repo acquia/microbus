@@ -1,5 +1,7 @@
 # Microbus
 
+[![Build Status](https://travis-ci.com/acquia/microbus.svg?token=oagyQubkw12Sp9ziGMif&branch=master)](https://travis-ci.com/acquia/microbus)
+
 Takes a Ruby project and quickly turns it into a small tarball suitable for
 deployment to Linux servers.
 
