@@ -48,7 +48,7 @@ module Microbus
     def check_docker
       # Check for docker
       unless system('docker info > /dev/null')
-        fail 'Docker is not installed or unavailable.'
+        raise 'Docker is not installed or unavailable.'
       end
     end
 
