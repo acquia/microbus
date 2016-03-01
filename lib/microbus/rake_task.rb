@@ -30,9 +30,9 @@ module Microbus
       end
     end
 
-    def initialize(name = :microbus, &block)
+    def initialize(name = :microbus, gem_name: nil, gem_base: nil, &block)
       @name = name.to_sym
-      @gem_helper = Bundler::GemHelper.new
+      @gem_helper = Bundler::GemHelper.new(gem_base, gem_name)
       @block = block if block_given?
       declare_tasks
     end
