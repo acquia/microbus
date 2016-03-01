@@ -1,4 +1,4 @@
-# Microbus
+# ![Microbus van](https://cloud.githubusercontent.com/assets/202230/13436627/d753eb9a-dfa5-11e5-8e97-ec3db22846e4.png) Microbus
 
 [![Build Status](https://travis-ci.com/acquia/microbus.svg?token=oagyQubkw12Sp9ziGMif&branch=master)](https://travis-ci.com/acquia/microbus)
 
