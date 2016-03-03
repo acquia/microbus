@@ -3,6 +3,7 @@ require 'rake'
 require 'rake/tasklib'
 
 require_relative 'docker'
+require_relative 'packager'
 
 module Microbus
   # Provides a custom rake task.
@@ -98,23 +99,11 @@ module Microbus
 
             docker.run(cmd)
           end
-
-          # Make it a tarball - note we exclude lots of redundant files, caches
-          # and tests to reduce the size of the tarball.
-          sh('tar' \
-            ' --exclude="*.c" --exclude="*.h" --exclude="*.o"' \
-            ' --exclude="*.gem" --exclude=".DS_Store"' \
-            ' --exclude="vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/ext/"' \
-            ' --exclude="vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/spec/"' \
-            ' --exclude="vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/test/"' \
-            ' --exclude="vendor/bundle/ruby/*[0-9]/extensions/"' \
-            ' --exclude="vendor/cache/extensions/"' \
-            " -czf ../#{opts.filename} *")
-
-          puts "Created #{opts.filename}"
-
-          docker.teardown
         end
+
+        Packager.new(opts).run
+
+        docker.teardown
       end
     end
 
@@ -130,7 +119,7 @@ module Microbus
           fl.exclude('build/vendor')
           fl.exclude('build/vendor/**/*')
         end
-        clean_files << args[:tarball]
+        clean_files << args[:tarball] if args[:tarball]
         clean_files << "#{@gem_helper.base}/build/" if args[:nuke]
 
         FileUtils.rm_rf(clean_files)

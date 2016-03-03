@@ -1,10 +1,10 @@
 AllCops:
   TargetRubyVersion: 2.2
   Exclude:
-  - 'binstubs/**/*'
-  - 'build/**/*'
+  - '**/*/binstubs/**/*'
+  - '**/*/build/**/*'
   - 'bundle/**/*'
   - 'packer/**/*'
-  - 'vendor/**/*'
+  - '**/*/vendor/**/*'
   - 'doc/api/*'
   - 'tmp/**/*'
