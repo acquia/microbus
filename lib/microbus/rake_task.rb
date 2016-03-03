@@ -10,24 +10,30 @@ module Microbus
   class RakeTask < Rake::TaskLib
     Options = Struct.new(:build_path, :deployment_path, :docker_path,
                          :docker_cache, :docker_image, :filename, :files,
-                         :gem_helper, :smoke_test_cmd) do
+                         :fpm_options, :gem_helper, :name, :smoke_test_cmd,
+                         :type, :version) do
       class << self
         private :new
-
+        # rubocop:disable MethodLength, AbcSize
         def create(gem_helper, block = nil)
           o = new
           # Set defaults.
+          o.name = gem_helper.gemspec.name
+          o.version = gem_helper.gemspec.version
           o.build_path = "#{gem_helper.base}/build"
-          o.deployment_path = "/opt/#{gem_helper.gemspec.name}"
+          o.deployment_path = "/opt/#{o.name}"
           o.docker_path = "#{gem_helper.base}/docker"
-          o.docker_image = "local/#{gem_helper.gemspec.name}-builder"
-          o.filename = ENV['OUTPUT_FILE'] || 'build.tar.gz'
+          o.docker_image = "local/#{o.name}-builder"
+          o.filename = ENV['OUTPUT_FILE']
           o.files = gem_helper.gemspec.files
           o.gem_helper = gem_helper
+          o.type = :tar
+          o.fpm_options = []
           # Set user overrides.
           block.call(o) if block
           o.freeze
         end
+        # rubocop:enable MethodLength, AbcSize
       end
     end
 
