@@ -1,6 +1,8 @@
+require_relative 'lib/basic'
+
 Gem::Specification.new do |s|
   s.name         = 'basic'
-  s.version      = '0.0.0'
+  s.version      = Basic::VERSION
   s.authors      = ['Basic']
   s.summary      = 'Test gemspec for microbus.'
   s.files        = Dir['Gemfile*', 'Rakefile', '*.gemspec', '*.md', '*.raml',

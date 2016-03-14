@@ -3,9 +3,21 @@ Feature: build
   I want to build my application into a tarball
   So that I can deploy my applications to Linux servers.
 
-  Scenario: Build a basic app (no native extensions)
+  Background:
     Given I use a fixture named "basic-app"
-    When I run `rake build`
+
+  Scenario: Build a basic app (no native extensions)
+    When I successfully run `rake build`
     Then the output should contain "Created build.tar.gz"
-    And the exit status should be 0
     And a file named "build.tar.gz" should exist
+
+  Scenario: Build a basic app as a debian package
+    Given I append to "Rakefile" with:
+    """
+    Microbus::RakeTask.new(:deb) do |opts|
+      opts.type = :deb
+    end
+    """
+    When I successfully run `rake deb`
+    Then the output should contain "Created basic_0.0.1_amd64.deb"
+    And a file named "basic_0.0.1_amd64.deb" should exist
