@@ -22,6 +22,8 @@ Microbus' tasks as the `build` namespace, add the following to your `Rakefile`:
 require 'microbus/rake_task'
 
 Microbus::RakeTask.new(:build) do |opts|
+  opts.type = :deb
+  opts.arch = 'x86_64'
   opts.deployment_path = "/opt/myorg/#{opts.gem_helper.gemspec.name}"
   opts.smoke_test_cmd = 'myapp --help'
 end

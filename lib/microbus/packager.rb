@@ -6,10 +6,11 @@ module Microbus
   class Packager
     include Rake::FileUtilsExt
 
-    attr_reader :opts
+    attr_reader :opts, :arch
 
-    def initialize(opts)
+    def initialize(opts, arch:)
       @opts = opts
+      @arch = arch
       # Default filename for tar because fpm chooses compression by filename
       # and for backwards compatibility.
       @filename = opts.filename
@@ -28,6 +29,7 @@ module Microbus
         '-s dir',
         "-t #{opts.type}",
         '-C build',
+        "-a #{arch}",
         '--exclude="**.c" --exclude="**.h" --exclude="**.o"',
         '--exclude="**.gem" --exclude="**.DS_Store"',
         '--exclude=".bundle"',
