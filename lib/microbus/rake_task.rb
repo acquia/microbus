@@ -7,11 +7,11 @@ require_relative 'packager'
 
 module Microbus
   # Provides a custom rake task.
-  class RakeTask < Rake::TaskLib
+  class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
     Options = Struct.new(:build_path, :deployment_path, :docker_path,
                          :docker_cache, :docker_image, :filename, :files,
                          :fpm_options, :gem_helper, :name, :smoke_test_cmd,
-                         :type, :version) do
+                         :type, :version, :arch) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
@@ -29,6 +29,7 @@ module Microbus
           o.gem_helper = gem_helper
           o.type = :tar
           o.fpm_options = []
+          o.arch = nil
           # Set user overrides.
           block.call(o) if block
           o.freeze
@@ -50,10 +51,27 @@ module Microbus
       namespace @name do
         declare_build_task
         declare_clean_task
+        declare_arch_task
       end
       # Declare a default task.
       desc "Shortcut for #{@name}:build"
       task @name => ["#{@name}:build"]
+    end
+
+    def declare_arch_task # rubocop:disable MethodLength, AbcSize
+      desc "Determine #{@gem_helper.gemspec.name} architecture"
+      task :arch do
+        docker = Docker.new(
+          path: opts.docker_path,
+          tag: opts.docker_image,
+          work_dir: opts.deployment_path,
+          local_dir: opts.build_path,
+          cache_dir: opts.docker_cache
+        )
+        docker.prepare
+        puts "Detected Architecture: #{docker.architecture(opts.type)}"
+        puts 'Set the arch option to override.'
+      end
     end
 
     def declare_build_task # rubocop:disable MethodLength, AbcSize
@@ -107,7 +125,10 @@ module Microbus
           end
         end
 
-        Packager.new(opts).run
+        Packager.new(
+          opts,
+          arch: opts.arch.nil? ? docker.architecture(opts.type) : opts.arch
+        ).run
 
         docker.teardown
       end

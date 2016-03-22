@@ -33,8 +33,31 @@ module Microbus
       docker(cmds.join(' && '))
     end
 
+    # Use FPM to determine the architecture of the docker instance.
+    def architecture(type)
+      fpm_package = FPM::Package.types[type.to_s].new
+      docker_obj = self
+      # Force commands executed in the FPM::Package classes via backticks (used
+      # to determine architecture) to be executed on the docker container rather
+      # than locally.
+      fpm_package.define_singleton_method(:`) do |cmd, docker = docker_obj|
+        Kernel.send(:`, docker.docker_command(cmd))
+      end
+      fpm_package.architecture
+    end
+
     def teardown
       update_docker_cache if @cache_dir
+    end
+
+    def docker_command(cmd)
+      'docker run' \
+        ' --interactive=false' \
+        ' --rm' \
+        " --volume \"#{@local_dir}\":#{@work_dir}" \
+        " --workdir #{@work_dir}" \
+        " #{@tag}" \
+        " bash -l -c '#{cmd}'"
     end
 
     private
@@ -54,13 +77,7 @@ module Microbus
 
     def docker(cmd)
       # Run everything in Docker.
-      sh('docker run' \
-              ' --interactive=false' \
-              ' --rm' \
-              " --volume \"#{@local_dir}\":#{@work_dir}" \
-              " --workdir #{@work_dir}" \
-              " #{@tag}" \
-              " bash -l -c '#{cmd}'")
+      sh(docker_command(cmd))
     end
 
     def docker_cache_filename
