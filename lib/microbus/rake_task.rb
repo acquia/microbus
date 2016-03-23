@@ -8,10 +8,10 @@ require_relative 'packager'
 module Microbus
   # Provides a custom rake task.
   class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
-    Options = Struct.new(:build_path, :deployment_path, :docker_path,
+    Options = Struct.new(:arch, :build_path, :deployment_path, :docker_path,
                          :docker_cache, :docker_image, :filename, :files,
-                         :fpm_options, :gem_helper, :name, :smoke_test_cmd,
-                         :type, :version, :arch) do
+                         :fpm_options, :gem_helper, :minimize, :name,
+                         :smoke_test_cmd, :type, :version) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
@@ -30,6 +30,7 @@ module Microbus
           o.type = :tar
           o.fpm_options = []
           o.arch = nil
+          o.minimize = false
           # Set user overrides.
           block.call(o) if block
           o.freeze
@@ -81,6 +82,7 @@ module Microbus
 
         # Copy only files declared in gemspec.
         sh("rsync -R #{opts.files.join(' ')} build")
+        FileUtils.cp("#{__dir__}/minimize.rb", 'build') if opts.minimize
 
         docker = Docker.new(
           path: opts.docker_path,
@@ -119,6 +121,7 @@ module Microbus
               ' --clean' \
               ' --frozen'
 
+            cmd << ' && ruby minimize.rb' if opts.minimize
             cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
 
             docker.run(cmd)
