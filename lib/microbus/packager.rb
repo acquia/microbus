@@ -30,14 +30,17 @@ module Microbus
         "-t #{opts.type}",
         '-C build',
         "-a #{arch}",
-        '--exclude="**.c" --exclude="**.h" --exclude="**.o"',
-        '--exclude="**.gem" --exclude="**.DS_Store"',
-        '--exclude=".bundle"',
-        '--exclude="vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/ext"',
-        '--exclude="vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/spec"',
-        '--exclude="vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/test"',
-        '--exclude="vendor/bundle/ruby/*[0-9]/extensions"',
-        '--exclude="vendor/cache/extensions"',
+        '-x **/*.gem',
+        '-x **/*.c',
+        '-x **/*.h',
+        '-x **/*.o',
+        '-x **/.DS_Store',
+        '-x **/*.bundle',
+        '-x vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/ext',
+        '-x vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/spec',
+        '-x vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/test',
+        '-x vendor/bundle/ruby/*[0-9]/extensions',
+        '-x vendor/cache/extensions',
         '--force'
       ]
       fpm_opts << "--prefix=#{@prefix}" if @prefix
@@ -57,6 +60,7 @@ module Microbus
       Cabin::Channel.get.subscribe(fpm_events)
 
       args = "#{opts.join(' ')} #{args}"
+      warn "fpm #{args}"
       code = ::FPM::Command.new('fpm').run(args.split(' '))
       raise 'fpm exited nonzero' unless code == 0
       event = fpm_events.find do |e|
