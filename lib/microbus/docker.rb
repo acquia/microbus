@@ -28,7 +28,9 @@ module Microbus
         cmd,
         # chown entire working dir, so that build
         # can be accessed as unprivileged user on Linux.
-        "chown -R duser:dgroup #{@work_dir}"
+        # We ignore errors here because errors can occur with files recently
+        # deleted.
+        "(chown -R duser:dgroup #{@work_dir} || true)"
       ]
       docker(cmds.join(' && '))
     end
