@@ -1,6 +1,6 @@
 # ![Microbus van](https://cloud.githubusercontent.com/assets/202230/13436627/d753eb9a-dfa5-11e5-8e97-ec3db22846e4.png) Microbus
 
-[![Build Status](https://travis-ci.com/acquia/microbus.svg?token=oagyQubkw12Sp9ziGMif&branch=master)](https://travis-ci.com/acquia/microbus)
+[![Build Status](https://travis-ci.org/acquia/microbus.svg?branch=master)](https://travis-ci.org/acquia/microbus)
 
 Takes a Ruby project and quickly turns it into a small tarball suitable for
 deployment to Linux servers.
