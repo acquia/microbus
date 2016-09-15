@@ -45,7 +45,7 @@ module Microbus
       ]
       fpm_opts << "--prefix=#{@prefix}" if @prefix
       fpm_opts << "--package=#{@filename}" if @filename
-      fpm_opts.push(*opts.fpm_options)
+      fpm_opts.concat(opts.fpm_options)
 
       file = fpm('.', fpm_opts)
 
@@ -62,7 +62,7 @@ module Microbus
       args = "#{opts.join(' ')} #{args}"
       warn "fpm #{args}"
       code = ::FPM::Command.new('fpm').run(args.split(' '))
-      raise 'fpm exited nonzero' unless code == 0
+      raise 'fpm exited nonzero' unless code.zero?
       event = fpm_events.find do |e|
         e[:message] == 'Created package'
       end
