@@ -1,3 +1,4 @@
+require 'digest'
 require 'fpm'
 require 'fpm/command'
 
@@ -20,7 +21,7 @@ module Microbus
       @prefix = opts.type == :tar ? nil : opts.deployment_path
     end
 
-    def run # rubocop:disable MethodLength
+    def run # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       # Make it a package - note we exclude lots of redundant files, caches
       # and tests to reduce the size.
       fpm_opts = [
@@ -50,10 +51,24 @@ module Microbus
       file = fpm('.', fpm_opts)
 
       puts "Created #{file}"
+      write_checksum if opts.checksum
       file
     end
 
     private
+
+    # Generates a checksum of the build file and writes it to a new file.
+    #
+    # @return [String] MD5 checksum.
+    def write_checksum
+      ext = opts.type == :tar ? '.tar.gz' : File.extname(@filename)
+      basename = File.basename(@filename, ext)
+
+      checksum = Digest::MD5.file(@filename).hexdigest
+      File.write("#{basename}.md5", checksum)
+      puts "Created #{basename}.md5"
+      checksum
+    end
 
     def fpm(args, opts = [])
       fpm_events = []
