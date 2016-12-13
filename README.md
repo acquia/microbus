@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/acquia/microbus.svg?branch=master)](https://travis-ci.org/acquia/microbus)
 
-Takes a Ruby project and quickly turns it into a small tarball suitable for
+Takes a Ruby project and quickly turns it into a small tarball or package suitable for
 deployment to Linux servers.
 
 ## Dependencies
