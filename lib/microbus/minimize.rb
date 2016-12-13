@@ -57,9 +57,8 @@ class Minimize
     # Use GNU find to prune empty directories.
     cmd = "find #{git_dir} -type d -empty -delete"
     Kernel.system(cmd)
-    if $CHILD_STATUS.exitstatus.nonzero?
-      raise "#{cmd} exited #{$CHILD_STATUS.exitstatus}"
-    end
+    return unless $CHILD_STATUS.exitstatus.nonzero?
+    raise "#{cmd} exited #{$CHILD_STATUS.exitstatus}"
   end
 end
 

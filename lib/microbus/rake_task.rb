@@ -78,7 +78,7 @@ module Microbus
 
     def declare_build_task # rubocop:disable MethodLength, AbcSize
       desc "Build #{@gem_helper.gemspec.name} tarball"
-      task :build do
+      task :build do # rubocop:disable Metrics/BlockLength
         Rake::Task["#{@name}:clean"].invoke(false)
 
         # Copy only files declared in gemspec.

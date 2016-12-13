@@ -72,9 +72,8 @@ module Microbus
 
     def check_docker
       # Check for docker
-      unless system('docker info > /dev/null')
-        raise 'Docker is not installed or unavailable.'
-      end
+      return if system('docker info > /dev/null')
+      raise 'Docker is not installed or unavailable.'
     end
 
     def docker(cmd)
@@ -88,19 +87,17 @@ module Microbus
 
     def restore_docker_cache
       FileUtils.mkdir_p(cache_dir)
-      if File.exist?(docker_cache_filename)
-        sh("docker load < #{docker_cache_filename}")
-        @cache_image_id = `docker images -q #{@tag}`.strip!
-        puts "Loaded #{@cache_image_id}" if @cache_image_id
-      end
+      return unless File.exist?(docker_cache_filename)
+      sh("docker load < #{docker_cache_filename}")
+      @cache_image_id = `docker images -q #{@tag}`.strip!
+      puts "Loaded #{@cache_image_id}" if @cache_image_id
     end
 
     def update_docker_cache
       image_id = `docker images -q #{@tag}`.strip!
-      if image_id && image_id != @cache_image_id
-        sh("docker save #{@tag} > #{docker_cache_filename}")
-        puts "Cached #{image_id}"
-      end
+      return unless image_id && image_id != @cache_image_id
+      sh("docker save #{@tag} > #{docker_cache_filename}")
+      puts "Cached #{image_id}"
     end
   end
 end
