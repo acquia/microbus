@@ -5,3 +5,9 @@ require 'microbus/rake_task'
 Microbus::RakeTask.new(:build) do |opts|
   opts.smoke_test_cmd = 'sequel --help'
 end
+
+# Deployment build tasks.
+Microbus::RakeTask.new(:build_checksum) do |opts|
+  opts.smoke_test_cmd = 'sequel --help'
+  opts.checksum = true
+end

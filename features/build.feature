@@ -21,3 +21,8 @@ Feature: build
     When I successfully run `rake deb`
     Then the output should contain "Created basic_0.0.1_amd64.deb"
     And a file named "basic_0.0.1_amd64.deb" should exist
+
+  Scenario: Build a basic app with checksum
+    When I successfully run `rake build_checksum`
+    Then a file named "build.md5" should exist
+    And the file "build.md5" should contain the MD5 digest for "build.tar.gz"
