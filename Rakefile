@@ -5,7 +5,7 @@ require 'cucumber/rake/task'
 require 'rubocop/rake_task'
 
 desc 'Run all required tests - simply run `rake`'
-task default: %w(rubocop features)
+task default: %w[rubocop features]
 
 Cucumber::Rake::Task.new(:features)
 

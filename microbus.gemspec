@@ -1,4 +1,5 @@
 # coding: utf-8
+
 require_relative 'lib/microbus/version'
 
 Gem::Specification.new do |s|
@@ -23,5 +24,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'cucumber'
   s.add_development_dependency 'rake', '~> 10.0'
   s.add_development_dependency 'rspec'
-  s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'rubocop', '~> 0.48.0'
 end

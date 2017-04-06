@@ -51,23 +51,35 @@ module Microbus
       file = fpm('.', fpm_opts)
 
       puts "Created #{file}"
-      write_checksum if opts.checksum
+      write_checksum && validate_checksum_file if opts.checksum
       file
     end
 
     private
 
+    def checksum
+      Digest::MD5.file(@filename).hexdigest
+    end
+
     # Generates a checksum of the build file and writes it to a new file.
     #
     # @return [String] MD5 checksum.
     def write_checksum
-      ext = opts.type == :tar ? '.tar.gz' : File.extname(@filename)
-      basename = File.basename(@filename, ext)
+      File.write(checksum_file, checksum)
+      puts "Created #{checksum_file}"
+    end
 
-      checksum = Digest::MD5.file(@filename).hexdigest
-      File.write("#{basename}.md5", checksum)
-      puts "Created #{basename}.md5"
-      checksum
+    def validate_checksum_file
+      raise 'Unexpected checksum file contents' \
+        unless checksum == File.read(checksum_file)
+    end
+
+    def checksum_file
+      @checksum_file ||= begin
+        ext = opts.type == :tar ? '.tar.gz' : File.extname(@filename)
+        basename = File.basename(@filename, ext)
+        "#{basename}.md5"
+      end
     end
 
     def fpm(args, opts = [])
