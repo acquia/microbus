@@ -21,18 +21,23 @@ module Microbus
     end
 
     def run(cmd)
-      cmds = [
-        # Create a user that matches the current user's UID and GID.
-        "groupadd -f -g #{@gid} dgroup",
-        "useradd -u #{@uid} -g dgroup duser",
-        cmd,
-        # chown entire working dir, so that build
-        # can be accessed as unprivileged user on Linux.
-        # We ignore errors here because errors can occur with files recently
-        # deleted.
-        "(chown -R duser:dgroup #{@work_dir} || true)"
-      ]
-      docker(cmds.join(' && '))
+      docker_beta = !ENV.key?('DOCKER_HOST')
+
+      unless docker_beta
+        cmd = [
+          # Create a user that matches the current user's UID and GID.
+          "groupadd -f -g #{@gid} dgroup",
+          "useradd -u #{@uid} -g dgroup duser",
+          cmd,
+          # chown entire working dir, so that build
+          # can be accessed as unprivileged user on Linux.
+          # We ignore errors here because errors can occur with files recently
+          # deleted.
+          "(chown -R duser:dgroup #{@work_dir} || true)"
+        ].join(' && ')
+      end
+
+      docker(cmd)
     end
 
     # Use FPM to determine the architecture of the docker instance.
