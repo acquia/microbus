@@ -82,8 +82,8 @@ module Microbus
         Rake::Task["#{@name}:clean"].invoke(false)
 
         # Copy only files declared in gemspec.
-        sh("rsync -R #{opts.files.join(' ')} build")
-        FileUtils.cp("#{__dir__}/minimize.rb", 'build') if opts.minimize
+        sh("rsync -R #{opts.files.join(' ')} #{opts.build_path}")
+        FileUtils.cp("#{__dir__}/minimize.rb", opts.build_path) if opts.minimize
 
         docker = Docker.new(
           path: opts.docker_path,
@@ -145,13 +145,13 @@ module Microbus
 
         # We don't delete the entire vendor so bundler runs faster (avoids
         # expanding gems and compiling native extensions again).
-        FileUtils.mkdir('build') unless Dir.exist?('build')
-        clean_files = Rake::FileList.new('build/**/*') do |fl|
-          fl.exclude('build/vendor')
-          fl.exclude('build/vendor/**/*')
+        FileUtils.mkdir(opts.build_path) unless Dir.exist?(opts.build_path)
+        clean_files = Rake::FileList.new("#{opts.build_path}/**/*") do |fl|
+          fl.exclude("#{opts.build_path}/vendor")
+          fl.exclude("#{opts.build_path}/vendor/**/*")
         end
         clean_files << args[:tarball] if args[:tarball]
-        clean_files << "#{@gem_helper.base}/build/" if args[:nuke]
+        clean_files << "#{opts.build_path}/" if args[:nuke]
 
         FileUtils.rm_rf(clean_files)
       end
