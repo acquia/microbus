@@ -29,7 +29,7 @@ module Microbus
         "--version=#{opts.version}",
         '-s dir',
         "-t #{opts.type}",
-        '-C build',
+        "-C #{opts.build_path}",
         "-a #{arch}",
         '-x **/*.gem',
         '-x **/*.c',
