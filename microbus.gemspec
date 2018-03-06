@@ -1,5 +1,3 @@
-# coding: utf-8
-
 require_relative 'lib/microbus/version'
 
 Gem::Specification.new do |s|
