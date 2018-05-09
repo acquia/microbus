@@ -11,7 +11,7 @@ module Microbus
     Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
-                         :smoke_test_cmd, :type, :version) do
+                         :smoke_test_cmd, :type, :version, :binstub_shebang) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
@@ -32,6 +32,7 @@ module Microbus
           o.arch = nil
           o.minimize = false
           o.checksum = false
+          o.binstub_shebang = nil
           # Set user overrides.
           block.call(o) if block
           o.freeze
@@ -113,6 +114,8 @@ module Microbus
               ' --without development' \
               ' --clean' \
               ' --frozen'
+
+            cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
             cmd << ' && ruby minimize.rb' if opts.minimize
             cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
