@@ -83,7 +83,8 @@ module Microbus
         Rake::Task["#{@name}:clean"].invoke(false)
 
         # Copy only files declared in gemspec.
-        sh("rsync -R #{opts.files.join(' ')} #{opts.build_path}")
+        files = opts.files.map { |file| Shellwords.escape(file) }
+        sh("rsync -R #{files.join(' ')} #{opts.build_path}")
         FileUtils.cp("#{__dir__}/minimize.rb", opts.build_path) if opts.minimize
 
         docker = Docker.new(
