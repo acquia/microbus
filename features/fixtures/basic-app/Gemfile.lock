@@ -1,5 +1,5 @@
 PATH
-  remote: ../../../.
+  remote: ../../..
   specs:
     microbus (0.0.1)
       bundler
@@ -9,6 +9,7 @@ PATH
   remote: .
   specs:
     basic (0.0.1)
+      oj
       sequel
 
 GEM
@@ -30,9 +31,10 @@ GEM
       clamp (~> 0.6)
       ffi
       json (>= 1.7.7)
-    json (1.8.3)
+    json (2.1.0)
+    oj (3.6.4)
     rake (10.5.0)
-    sequel (4.32.0)
+    sequel (5.10.0)
 
 PLATFORMS
   ruby
@@ -43,4 +45,4 @@ DEPENDENCIES
   rake
 
 BUNDLED WITH
-   1.11.2
+   1.16.2

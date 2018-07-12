@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.executables = Dir['bin/*'].map { |f| File.basename(f) }
 
   s.add_dependency('sequel')
+  s.add_dependency('oj')
 
   # s.add_development_dependency('microbus')
   s.add_development_dependency('rake')

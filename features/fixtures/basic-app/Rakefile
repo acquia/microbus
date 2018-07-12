@@ -3,7 +3,7 @@ require 'microbus/rake_task'
 
 # Deployment build tasks.
 Microbus::RakeTask.new(:build) do |opts|
-  opts.smoke_test_cmd = 'sequel --help'
+  opts.smoke_test_cmd = 'smoke'
 end
 
 # Deployment build tasks.
