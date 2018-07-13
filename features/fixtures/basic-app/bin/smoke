@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-require 'sequel'
 require 'oj'
+require 'sequel'
 
-::Oj
-::Sequel
+warn ::Oj.dump('oj' => 'is working')
+warn ::Sequel::VERSION

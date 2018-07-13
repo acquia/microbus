@@ -90,7 +90,7 @@ module Microbus
         docker = Docker.new(
           path: opts.docker_path,
           tag: opts.docker_image,
-          work_dir: '/source',
+          work_dir: opts.deployment_path,
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache
         )
@@ -117,17 +117,7 @@ module Microbus
               ' --frozen'
 
             cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
-            cmd << " && mkdir -p #{opts.deployment_path}"
-            cmd << " && rsync -R /source #{opts.deployment_path}" \
-              ' --exclude **/*.gem' \
-              ' --exclude **/*.c' \
-              ' --exclude **/*.h' \
-              ' --exclude **/*.o' \
-              ' --exclude **/.DS_Store' \
-              ' --exclude **/*.bundle' \
-              ' --exclude vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/spec' \
-              ' --exclude vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/test' \
-              ' --exclude vendor/cache/extensions'
+
             cmd << ' && ruby minimize.rb' if opts.minimize
             cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
 
