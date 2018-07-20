@@ -3,8 +3,9 @@ AllCops:
   Exclude:
   - '**/*/binstubs/**/*'
   - '**/*/build/**/*'
-  - 'bundle/**/*'
-  - 'packer/**/*'
   - '**/*/vendor/**/*'
+  - 'bundle/**/*'
   - 'doc/api/*'
+  - 'packer/**/*'
   - 'tmp/**/*'
+  - 'vendor/**/*'

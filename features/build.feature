@@ -6,7 +6,7 @@ Feature: build
   Background:
     Given I use a fixture named "basic-app"
 
-  Scenario: Build a basic app (no native extensions)
+  Scenario: Build a basic app
     When I successfully run `rake build`
     Then the output should contain "Created build.tar.gz"
     And a file named "build.tar.gz" should exist

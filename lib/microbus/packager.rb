@@ -37,10 +37,8 @@ module Microbus
         '-x **/*.o',
         '-x **/.DS_Store',
         '-x **/*.bundle',
-        '-x vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/ext',
         '-x vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/spec',
         '-x vendor/bundle/ruby/*[0-9]/gems/*-*[0-9]/test',
-        '-x vendor/bundle/ruby/*[0-9]/extensions',
         '-x vendor/cache/extensions',
         '--force'
       ]
