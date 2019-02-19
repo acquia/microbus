@@ -56,12 +56,12 @@ module Microbus
     private
 
     def checksum
-      Digest::MD5.file(@filename).hexdigest
+      Digest::SHA256.file(@filename).hexdigest
     end
 
     # Generates a checksum of the build file and writes it to a new file.
     #
-    # @return [String] MD5 checksum.
+    # @return [String] SHA256 checksum.
     def write_checksum
       File.write(checksum_file, checksum)
       puts "Created #{checksum_file}"
@@ -76,7 +76,7 @@ module Microbus
       @checksum_file ||= begin
         ext = opts.type == :tar ? '.tar.gz' : File.extname(@filename)
         basename = File.basename(@filename, ext)
-        "#{basename}.md5"
+        "#{basename}.sha256"
       end
     end
 
