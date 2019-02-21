@@ -24,5 +24,5 @@ Feature: build
 
   Scenario: Build a basic app with checksum
     When I successfully run `rake build_checksum`
-    Then a file named "build.md5" should exist
-    And the file "build.md5" should contain the MD5 digest for "build.tar.gz"
+    Then a file named "build.sha256" should exist
+    And the file "build.sha256" should contain the SHA-256 digest for "build.tar.gz"
