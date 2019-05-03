@@ -44,6 +44,7 @@ module Microbus
       ]
       fpm_opts << "--prefix=#{@prefix}" if @prefix
       fpm_opts << "--package=#{@filename}" if @filename
+      fpm_opts << '--rpm-os=linux' if @opts.type == :rpm
       fpm_opts.concat(opts.fpm_options)
 
       file = fpm('.', fpm_opts)
