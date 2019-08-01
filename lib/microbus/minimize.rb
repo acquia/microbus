@@ -28,7 +28,7 @@ class Minimize
   # List all runtime specifications.
   # @return [Array<Gem::Specification>]
   def runtime_specs
-    @bundler.specs.materialize(@bundler.dependencies_for(:default))
+    @bundler.specs.materialize(dependencies)
   end
 
   # List all files declared by runtime git gem gemspecs.
@@ -59,6 +59,15 @@ class Minimize
     Kernel.system(cmd)
     return unless $CHILD_STATUS.exitstatus.nonzero?
     raise "#{cmd} exited #{$CHILD_STATUS.exitstatus}"
+  end
+
+  private
+
+  # Select dependencies to be included in the build.
+  #
+  # @return [Array<Bundler::Dependency>]
+  def dependencies
+    @bundler.dependencies.select { |d| d.groups.include?(:default) }
   end
 end
 
