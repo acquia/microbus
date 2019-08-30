@@ -84,7 +84,7 @@ module Microbus
 
         # Copy only files declared in gemspec.
         files = opts.files.map { |file| Shellwords.escape(file) }
-        sh("rsync -R #{files.join(' ')} #{opts.build_path}")
+        sh("rsync -rR #{files.join(' ')} #{opts.build_path}")
         FileUtils.cp("#{__dir__}/minimize.rb", opts.build_path) if opts.minimize
 
         docker = Docker.new(
