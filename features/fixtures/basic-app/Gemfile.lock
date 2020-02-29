@@ -33,7 +33,7 @@ GEM
       json (>= 1.7.7)
     json (2.1.0)
     oj (3.6.4)
-    rake (10.5.0)
+    rake (12.3.3)
     sequel (5.10.0)
 
 PLATFORMS
