@@ -3,6 +3,7 @@ module Microbus
   class Docker
     include Rake::FileUtilsExt
 
+    # rubocop:disable Metrics/ParameterLists
     def initialize(path:, tag:, work_dir:, local_dir:, cache_dir: nil,
                    gid: Process::Sys.getegid, uid: Process::Sys.geteuid)
       @path = path
@@ -14,6 +15,7 @@ module Microbus
       @uid = uid
       @cache_dir = cache_dir
     end
+    # rubocop:enable Metrics/ParameterLists
 
     def prepare
       check_docker
