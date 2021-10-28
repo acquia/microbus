@@ -12,7 +12,7 @@ module Microbus
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
                          :smoke_test_cmd, :type, :version, :binstub_shebang,
-                         :uid, :gid) do
+                         :gid, :uid) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
