@@ -11,7 +11,8 @@ module Microbus
     Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
-                         :smoke_test_cmd, :type, :version, :binstub_shebang) do
+                         :smoke_test_cmd, :type, :version, :binstub_shebang,
+                         :uid, :gid) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
@@ -36,6 +37,8 @@ module Microbus
           # Set user overrides.
           block.call(o) if block
           o.freeze
+          o.gid = Process::Sys.getegid
+          o.uid = Process::Sys.geteuid
         end
         # rubocop:enable MethodLength, AbcSize
       end
