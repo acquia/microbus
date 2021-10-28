@@ -3,7 +3,8 @@ module Microbus
   class Docker
     include Rake::FileUtilsExt
 
-    def initialize(path:, tag:, work_dir:, local_dir:, gid:, uid:, cache_dir: nil)
+    def initialize(path:, tag:, work_dir:, local_dir:, gid:, uid:, 
+                   cache_dir: nil)
       @path = path
       @tag = tag
       @work_dir = work_dir
