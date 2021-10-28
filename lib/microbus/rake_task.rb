@@ -72,7 +72,9 @@ module Microbus
           tag: opts.docker_image,
           work_dir: opts.deployment_path,
           local_dir: opts.build_path,
-          cache_dir: opts.docker_cache
+          cache_dir: opts.docker_cache,
+          gid: opts.gid,
+          uid: opts.uid
         )
         docker.prepare
         puts "Detected Architecture: #{docker.architecture(opts.type)}"
@@ -95,7 +97,9 @@ module Microbus
           tag: opts.docker_image,
           work_dir: opts.deployment_path,
           local_dir: opts.build_path,
-          cache_dir: opts.docker_cache
+          cache_dir: opts.docker_cache,
+          gid: opts.gid,
+          uid: opts.uid
         )
 
         docker.prepare
