@@ -3,14 +3,14 @@ module Microbus
   class Docker
     include Rake::FileUtilsExt
 
-    def initialize(path:, tag:, work_dir:, local_dir:, cache_dir: nil)
+    def initialize(path:, tag:, work_dir:, local_dir:, cache_dir: nil, gid: Process::Sys.getegid, uid: Process::Sys.geteuid)
       @path = path
       @tag = tag
       @work_dir = work_dir
       @local_dir = local_dir
       # Gather uid and gid so we can match file ownership on Linux hosts.
-      @gid = Process::Sys.getegid
-      @uid = Process::Sys.geteuid
+      @gid = gid
+      @uid = uid
       @cache_dir = cache_dir
     end
 
