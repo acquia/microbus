@@ -34,11 +34,11 @@ module Microbus
           o.minimize = false
           o.checksum = false
           o.binstub_shebang = nil
+          o.gid = Process::Sys.getegid
+          o.uid = Process::Sys.geteuid
           # Set user overrides.
           block.call(o) if block
           o.freeze
-          o.gid = Process::Sys.getegid
-          o.uid = Process::Sys.geteuid
         end
         # rubocop:enable MethodLength, AbcSize
       end
