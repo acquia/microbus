@@ -11,7 +11,8 @@ module Microbus
     Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
-                         :smoke_test_cmd, :type, :version, :binstub_shebang) do
+                         :smoke_test_cmd, :type, :version, :binstub_shebang,
+                         :gid, :uid) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
@@ -33,6 +34,8 @@ module Microbus
           o.minimize = false
           o.checksum = false
           o.binstub_shebang = nil
+          o.gid = Process::Sys.getegid
+          o.uid = Process::Sys.geteuid
           # Set user overrides.
           block.call(o) if block
           o.freeze
@@ -69,7 +72,9 @@ module Microbus
           tag: opts.docker_image,
           work_dir: opts.deployment_path,
           local_dir: opts.build_path,
-          cache_dir: opts.docker_cache
+          cache_dir: opts.docker_cache,
+          gid: opts.gid,
+          uid: opts.uid
         )
         docker.prepare
         puts "Detected Architecture: #{docker.architecture(opts.type)}"
@@ -92,7 +97,9 @@ module Microbus
           tag: opts.docker_image,
           work_dir: opts.deployment_path,
           local_dir: opts.build_path,
-          cache_dir: opts.docker_cache
+          cache_dir: opts.docker_cache,
+          gid: opts.gid,
+          uid: opts.uid
         )
 
         docker.prepare
