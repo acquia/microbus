@@ -3,8 +3,8 @@ require_relative 'lib/microbus/version'
 Gem::Specification.new do |s|
   s.name          = 'microbus'
   s.version       = Microbus::VERSION
-  s.authors       = ['Glenn Pratt']
-  s.email         = ['glenn.pratt@acquia.com']
+  s.authors       = ['Glenn Pratt', 'Peter Drake']
+  s.email         = ['glenn.pratt@acquia.com', 'peter.drake@acquia.com']
 
   s.summary       = 'Simple app deployment builder using docker.'
   s.homepage      = 'https://dev.acquia.com/'
@@ -16,11 +16,12 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.add_dependency 'bundler'
-  s.add_dependency 'fpm', '~> 1.4'
+  s.add_dependency 'fpm', '> 1.4'
 
-  s.add_development_dependency 'aruba', '~> 0.13'
+  s.add_development_dependency 'aruba', '> 0.13'
   s.add_development_dependency 'cucumber'
-  s.add_development_dependency 'rake', '~> 10.0'
+  s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rubocop', '~> 0.48.0'
+  s.add_development_dependency 'minitest'
 end
