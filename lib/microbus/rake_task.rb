@@ -11,7 +11,7 @@ module Microbus
     Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
-                         :smoke_test_cmd, :type, :version, :binstub_shebang) do
+                         :smoke_test_cmd, :type, :version, :binstub_shebang, :skip_docker) do
       class << self
         private :new
         # rubocop:disable MethodLength, AbcSize
@@ -33,6 +33,7 @@ module Microbus
           o.minimize = false
           o.checksum = false
           o.binstub_shebang = nil
+          o.skip_docker = false
           # Set user overrides.
           block.call(o) if block
           o.freeze
@@ -95,7 +96,7 @@ module Microbus
           cache_dir: opts.docker_cache
         )
 
-        docker.prepare
+        docker.prepare unless opts.skip_docker
 
         Dir.chdir(opts.build_path) do
           Bundler.with_clean_env do
@@ -121,16 +122,16 @@ module Microbus
             cmd << ' && ruby minimize.rb' if opts.minimize
             cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
 
-            docker.run(cmd)
+            opts.skip_docker ? sh(cmd) : docker.run(cmd)
           end
         end
 
         Packager.new(
           opts,
-          arch: opts.arch.nil? ? docker.architecture(opts.type) : opts.arch
+          arch: opts.arch || docker.architecture(opts.type)
         ).run
 
-        docker.teardown
+        docker.teardown unless opts.skip_docker
       end
     end
 
