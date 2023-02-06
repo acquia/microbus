@@ -26,8 +26,8 @@ module Microbus
     def run(cmd)
       cmds = [
         # Create a user that matches the current user's UID and GID.
-        "groupadd -f -g #{@gid} dgroup",
-        "useradd -u #{@uid} -g dgroup duser",
+        # "groupadd -f -g #{@gid} dgroup",
+        # "useradd -u #{@uid} -g dgroup duser",
         cmd,
         # chown entire working dir, so that build
         # can be accessed as unprivileged user on Linux.
