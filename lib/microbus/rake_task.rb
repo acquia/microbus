@@ -123,8 +123,7 @@ module Microbus
               ' --standalone' \
               ' --binstubs binstubs' \
               ' --without development' \
-              ' --clean' \
-              ' --frozen'
+              ' --clean'
 
             cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
