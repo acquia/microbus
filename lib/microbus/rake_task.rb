@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
 
 require 'bundler/gem_helper'
 require 'rake'
@@ -123,7 +123,8 @@ module Microbus
               ' --standalone' \
               ' --binstubs binstubs' \
               ' --without development' \
-              ' --clean'
+              ' --clean' \
+              ' --frozen'
 
             cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
