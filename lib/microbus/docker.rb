@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Microbus
   # Handle creation and execution inside a docker image.
   class Docker
@@ -76,6 +78,7 @@ module Microbus
     def check_docker
       # Check for docker
       return if system('docker info > /dev/null')
+
       raise 'Docker is not installed or unavailable.'
     end
 
@@ -91,6 +94,7 @@ module Microbus
     def restore_docker_cache
       FileUtils.mkdir_p(cache_dir)
       return unless File.exist?(docker_cache_filename)
+
       sh("docker load < #{docker_cache_filename}")
       @cache_image_id = `docker images -q #{@tag}`.strip!
       puts "Loaded #{@cache_image_id}" if @cache_image_id
@@ -99,6 +103,7 @@ module Microbus
     def update_docker_cache
       image_id = `docker images -q #{@tag}`.strip!
       return unless image_id && image_id != @cache_image_id
+
       sh("docker save #{@tag} > #{docker_cache_filename}")
       puts "Cached #{image_id}"
     end

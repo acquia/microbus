@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bundler/setup'
 require 'English'
 require 'json'
@@ -37,7 +39,7 @@ class Minimize
 
     runtime_specs.each do |spec|
       # Check if this is a git gem.
-      md = %r{(.+(bundler/gems|vendor/cache)\/.+-[a-f0-9]{7,12})}
+      md = %r{(.+(bundler/gems|vendor/cache).+-[a-f0-9]{7,12})}
            .match(spec.full_gem_path)
       next unless md
 
@@ -58,6 +60,7 @@ class Minimize
     cmd = "find #{git_dir} -type d -empty -delete"
     Kernel.system(cmd)
     return unless $CHILD_STATUS.exitstatus.nonzero?
+
     raise "#{cmd} exited #{$CHILD_STATUS.exitstatus}"
   end
 
