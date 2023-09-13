@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'digest'
 require 'fpm'
 require 'fpm/command'
@@ -89,6 +91,7 @@ module Microbus
       warn "fpm #{args}"
       code = ::FPM::Command.new('fpm').run(args.split(' '))
       raise 'fpm exited nonzero' unless code.zero?
+
       event = fpm_events.find do |e|
         e[:message] == 'Created package'
       end

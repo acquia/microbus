@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'lib/basic'
 
 Gem::Specification.new do |s|
@@ -9,11 +11,12 @@ Gem::Specification.new do |s|
                        '*.ru', '*.yml',
                        '{bin,config,db,doc,lib,schema,script}/**/*']
   s.require_path = 'lib'
-  s.bindir       = 'bin'
+  s.required_ruby_version = '>= 2.6'
+  s.bindir = 'bin'
   s.executables = Dir['bin/*'].map { |f| File.basename(f) }
 
-  s.add_dependency('sequel')
   s.add_dependency('oj')
+  s.add_dependency('sequel')
 
   # s.add_development_dependency('microbus')
   s.add_development_dependency('rake')

@@ -1,3 +1,5 @@
+# frozen_string_literal: false
+
 require 'bundler/gem_helper'
 require 'rake'
 require 'rake/tasklib'
@@ -15,7 +17,7 @@ module Microbus
                          :gid, :uid) do
       class << self
         private :new
-        # rubocop:disable MethodLength, AbcSize
+        # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
         def create(gem_helper, block = nil)
           o = new
           # Set defaults.
@@ -37,14 +39,15 @@ module Microbus
           o.gid = Process::Sys.getegid
           o.uid = Process::Sys.geteuid
           # Set user overrides.
-          block.call(o) if block
+          block&.call(o) if block
           o.freeze
         end
-        # rubocop:enable MethodLength, AbcSize
+        # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
       end
     end
 
     def initialize(name = :microbus, gem_name: nil, gem_base: nil, &block)
+      super()
       @name = name.to_sym
       @gem_helper = Bundler::GemHelper.new(gem_base, gem_name)
       @block = block if block_given?
@@ -64,7 +67,7 @@ module Microbus
       task @name => ["#{@name}:build"]
     end
 
-    def declare_arch_task # rubocop:disable MethodLength, AbcSize
+    def declare_arch_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       desc "Determine #{@gem_helper.gemspec.name} architecture"
       task :arch do
         docker = Docker.new(
@@ -82,7 +85,7 @@ module Microbus
       end
     end
 
-    def declare_build_task # rubocop:disable MethodLength, AbcSize
+    def declare_build_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       desc "Build #{@gem_helper.gemspec.name} tarball"
       task :build do # rubocop:disable Metrics/BlockLength
         Rake::Task["#{@name}:clean"].invoke(false)
@@ -157,7 +160,7 @@ module Microbus
       File.delete(bundle_config) if File.exist?(bundle_config)
     end
 
-    def declare_clean_task # rubocop:disable MethodLength, AbcSize
+    def declare_clean_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
       desc 'Clean build artifacts'
       task :clean, :nuke, :tarball do |_t, args|
         args.with_defaults(nuke: true, tarball: opts.filename)
