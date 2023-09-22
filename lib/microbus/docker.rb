@@ -72,8 +72,8 @@ module Microbus
     def build_docker_image(path, tag, options = {})
       # Use docker to install, building native extensions on an OS similar to
       # our deployment environment.
-      self.pass = options[:pass] || ''
-      self.ruby_version = options[:ruby_version] || '2.7'
+      pass = options[:pass] || ''
+      ruby_version = options[:ruby_version] || '3.1.2'
       sh("docker build -t #{tag} #{os} #{ruby_version} #{path}/.")
       sh("docker build --build-arg PASS=#{pass} --build-arg RUBY_VERSION=#{ruby_version} -t #{tag} #{path}/.")
     end
