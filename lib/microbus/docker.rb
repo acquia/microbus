@@ -7,7 +7,7 @@ module Microbus
 
     # rubocop:disable Metrics/ParameterLists
     def initialize(path:, tag:, work_dir:, local_dir:, cache_dir: nil,
-                   gid: Process::Sys.getegid, uid: Process::Sys.geteuid)
+                   gid: Process::Sys.getegid, uid: Process::Sys.geteuid, fpm_options:)
       @path = path
       @tag = tag
       @work_dir = work_dir
@@ -16,13 +16,14 @@ module Microbus
       @gid = gid
       @uid = uid
       @cache_dir = cache_dir
+      @fpm_options = fpm_options
     end
     # rubocop:enable Metrics/ParameterLists
 
     def prepare
       check_docker
       restore_docker_cache if @cache_dir
-      build_docker_image(@path, @tag, @options = {})
+      build_docker_image(@path, @tag, @fpm_options)
     end
 
     def run(cmd)
@@ -69,11 +70,11 @@ module Microbus
 
     private
 
-    def build_docker_image(path, tag, options = {})
+    def build_docker_image(path, tag, fpm_options)
       # Use docker to install, building native extensions on an OS similar to
       # our deployment environment.
-      pass = options[:pass] || ''
-      ruby_version = options[:ruby_version] || '3.1.2'
+      pass = fpm_options.select{ |s| s.include? 'PASS' }
+      ruby_version = fpm_options.select{ |s| s.include? 'RUBY_VERSION' }
       sh("docker build --build-arg PASS=#{pass} --build-arg RUBY_VERSION=#{ruby_version} -t #{tag} #{path}/.")
     end
 

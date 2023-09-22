@@ -77,7 +77,8 @@ module Microbus
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache,
           gid: opts.gid,
-          uid: opts.uid
+          uid: opts.uid,
+          fpm_options: fpm_options
         )
         docker.prepare
         puts "Detected Architecture: #{docker.architecture(opts.type)}"
@@ -102,7 +103,8 @@ module Microbus
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache,
           gid: opts.gid,
-          uid: opts.uid
+          uid: opts.uid,
+          fpm_options: fpm_options
         )
 
         docker.prepare
