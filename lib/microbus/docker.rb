@@ -75,7 +75,7 @@ module Microbus
       # our deployment environment.
       pass = fpm_options.select{ |s| s.include? 'PASS' }
       ruby_version = fpm_options.select{ |s| s.include? 'RUBY_VERSION' }
-      sh("docker build --build-arg PASS=#{pass} --build-arg RUBY_VERSION=#{ruby_version} -t #{tag} #{path}/.")
+      sh("docker build #{pass} #{ruby_version} -t #{tag} #{path}/.")
     end
 
     def check_docker
