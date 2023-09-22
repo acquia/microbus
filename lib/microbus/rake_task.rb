@@ -10,11 +10,11 @@ require_relative 'packager'
 module Microbus
   # Provides a custom rake task.
   class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
-    Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
+    Options = Struct.new(:arch, :build_path, :checksum, :deployment_path, :docker_args,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
                          :smoke_test_cmd, :type, :version, :binstub_shebang,
-                         :gid, :uid, :docker_args) do
+                         :gid, :uid) do
       class << self
         private :new
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
@@ -25,6 +25,7 @@ module Microbus
           o.version = gem_helper.gemspec.version
           o.build_path = "#{gem_helper.base}/build"
           o.deployment_path = "/opt/#{o.name}"
+          o.docker_args = []
           o.docker_path = "#{gem_helper.base}/docker"
           o.docker_image = "local/#{o.name}-builder"
           o.filename = ENV['OUTPUT_FILE']
@@ -38,7 +39,6 @@ module Microbus
           o.binstub_shebang = nil
           o.gid = Process::Sys.getegid
           o.uid = Process::Sys.geteuid
-          o.docker_args = nil
           # Set user overrides.
           block&.call(o) if block
           o.freeze

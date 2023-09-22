@@ -73,6 +73,7 @@ module Microbus
     def build_docker_image(path, tag, docker_args)
       # Use docker to install, building native extensions on an OS similar to
       # our deployment environment.
+      docker_args = docker_args.join(' ')
       sh("docker build #{docker_args} -t #{tag} #{path}/.")
     end
 
