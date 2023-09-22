@@ -23,7 +23,7 @@ module Microbus
     def prepare
       check_docker
       restore_docker_cache if @cache_dir
-      build_docker_image(@path, @tag, @fpm_options)
+      build_docker_image(@path, @tag, @docker_args)
     end
 
     def run(cmd)
