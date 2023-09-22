@@ -74,7 +74,6 @@ module Microbus
       # our deployment environment.
       pass = options[:pass] || ''
       ruby_version = options[:ruby_version] || '3.1.2'
-      sh("docker build -t #{tag} #{os} #{ruby_version} #{path}/.")
       sh("docker build --build-arg PASS=#{pass} --build-arg RUBY_VERSION=#{ruby_version} -t #{tag} #{path}/.")
     end
 
