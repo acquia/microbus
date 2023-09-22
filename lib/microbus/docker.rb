@@ -73,8 +73,8 @@ module Microbus
     def build_docker_image(path, tag, fpm_options)
       # Use docker to install, building native extensions on an OS similar to
       # our deployment environment.
-      pass = fpm_options.select{ |s| s.include? 'PASS' }
-      ruby_version = fpm_options.select{ |s| s.include? 'RUBY_VERSION' }
+      pass = fpm_options.detect{ |s| s.include? 'PASS' }
+      ruby_version = fpm_options.detect{ |s| s.include? 'RUBY_VERSION' }
       sh("docker build #{pass} #{ruby_version} -t #{tag} #{path}/.")
     end
 
