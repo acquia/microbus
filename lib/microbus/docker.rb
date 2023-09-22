@@ -22,7 +22,7 @@ module Microbus
     def prepare
       check_docker
       restore_docker_cache if @cache_dir
-      build_docker_image(@path, @tag)
+      build_docker_image(@path, @tag, @options = {})
     end
 
     def run(cmd)
@@ -69,10 +69,13 @@ module Microbus
 
     private
 
-    def build_docker_image(path, tag)
+    def build_docker_image(path, tag, options = {})
       # Use docker to install, building native extensions on an OS similar to
       # our deployment environment.
-      sh("docker build -t #{tag} #{path}/.")
+      self.pass = options[:pass] || ''
+      self.ruby_version = options[:ruby_version] || '2.7'
+      sh("docker build -t #{tag} #{os} #{ruby_version} #{path}/.")
+      sh("docker build --build-arg PASS=#{pass} --build-arg RUBY_VERSION=#{ruby_version} -t #{tag} #{path}/.")
     end
 
     def check_docker
