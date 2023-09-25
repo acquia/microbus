@@ -7,7 +7,7 @@ module Microbus
 
     # rubocop:disable Metrics/ParameterLists
     def initialize(path:, tag:, work_dir:, local_dir:, cache_dir: nil,
-                   gid: Process::Sys.getegid, uid: Process::Sys.geteuid)
+                   gid: Process::Sys.getegid, uid: Process::Sys.geteuid, docker_args:)
       @path = path
       @tag = tag
       @work_dir = work_dir
@@ -16,13 +16,14 @@ module Microbus
       @gid = gid
       @uid = uid
       @cache_dir = cache_dir
+      @docker_args = docker_args
     end
     # rubocop:enable Metrics/ParameterLists
 
     def prepare
       check_docker
       restore_docker_cache if @cache_dir
-      build_docker_image(@path, @tag)
+      build_docker_image(@path, @tag, @docker_args)
     end
 
     def run(cmd)
@@ -69,10 +70,11 @@ module Microbus
 
     private
 
-    def build_docker_image(path, tag)
+    def build_docker_image(path, tag, docker_args)
       # Use docker to install, building native extensions on an OS similar to
       # our deployment environment.
-      sh("docker build -t #{tag} #{path}/.")
+      docker_args = docker_args.join(' ')
+      sh("docker build #{docker_args} -t #{tag} #{path}/.")
     end
 
     def check_docker
