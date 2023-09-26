@@ -16,9 +16,9 @@ Gem::Specification.new do |s|
   s.bindir        = 'bin'
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.require_paths = ['lib']
-  s.required_ruby_version = '>= 2.6'
+  s.required_ruby_version = '3.1'
 
-  s.add_dependency 'bundler'
+  s.add_dependency 'bundler','2.1.4'
   s.add_dependency 'fpm', '> 1.4'
 
   s.add_development_dependency 'aruba', '> 0.13'
