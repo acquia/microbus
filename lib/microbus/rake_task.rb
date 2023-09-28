@@ -10,7 +10,7 @@ require_relative 'packager'
 module Microbus
   # Provides a custom rake task.
   class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
-    Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
+    Options = Struct.new(:arch, :build_path, :checksum, :deployment_path, :docker_args,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
                          :smoke_test_cmd, :type, :version, :binstub_shebang,
@@ -25,6 +25,7 @@ module Microbus
           o.version = gem_helper.gemspec.version
           o.build_path = "#{gem_helper.base}/build"
           o.deployment_path = "/opt/#{o.name}"
+          o.docker_args = []
           o.docker_path = "#{gem_helper.base}/docker"
           o.docker_image = "local/#{o.name}-builder"
           o.filename = ENV['OUTPUT_FILE']
@@ -77,7 +78,8 @@ module Microbus
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache,
           gid: opts.gid,
-          uid: opts.uid
+          uid: opts.uid,
+          docker_args: opts.docker_args
         )
         docker.prepare
         puts "Detected Architecture: #{docker.architecture(opts.type)}"
@@ -102,7 +104,8 @@ module Microbus
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache,
           gid: opts.gid,
-          uid: opts.uid
+          uid: opts.uid,
+          docker_args: opts.docker_args
         )
 
         docker.prepare
@@ -116,15 +119,16 @@ module Microbus
             # running in docker if need be.
             # @todo When https://github.com/bundler/bundler/issues/4144
             # is released, --jobs can be increased.
+            sh("bundle config set clean 'true'")
+            sh("bundle config set frozen 'true'")
+            sh("bundle config set path 'vendor/bundle'")
+            sh("bundle config set without 'development'")
+            
             cmd =
               'bundle install' \
               ' --jobs 1' \
-              ' --path vendor/bundle' \
               ' --standalone' \
-              ' --binstubs binstubs' \
-              ' --without development' \
-              ' --clean' \
-              ' --frozen'
+              ' --binstubs binstubs'
 
             cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
