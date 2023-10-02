@@ -124,18 +124,25 @@ module Microbus
             sh("bundle config set path 'vendor/bundle'")
             sh("bundle config set without 'development'")
             
-            cmd =
-              'bundle install' \
-              ' --jobs 1' \
-              ' --standalone' \
-              ' --binstubs binstubs'
+            begin
+              cmd =
+                'bundle install' \
+                ' --jobs 1' \
+                ' --standalone' \
+                ' --binstubs binstubs'
 
-            cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
+              cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
-            cmd << ' && ruby minimize.rb' if opts.minimize
-            cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
+              cmd << ' && ruby minimize.rb' if opts.minimize
+              cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
 
-            docker.run(cmd)
+              docker.run(cmd)
+            ensure
+              sh("bundle config --delete clean")
+              sh("bundle config --delete frozen")
+              sh("bundle config --delete path")
+              sh("bundle config --delete without")
+            end
           end
         end
 
