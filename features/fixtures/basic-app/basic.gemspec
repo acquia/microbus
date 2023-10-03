@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
                        '*.ru', '*.yml',
                        '{bin,config,db,doc,lib,schema,script}/**/*']
   s.require_path = 'lib'
-  s.required_ruby_version = '>= 2.6'
+  s.required_ruby_version = '>= 3.1.2'
   s.bindir = 'bin'
   s.executables = Dir['bin/*'].map { |f| File.basename(f) }
 
