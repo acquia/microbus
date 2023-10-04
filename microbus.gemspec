@@ -20,7 +20,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'bundler'
   s.add_dependency 'fpm', '> 1.4'
-  
   s.add_development_dependency 'aruba', '> 0.13'
   s.add_development_dependency 'cucumber'
   s.add_development_dependency 'minitest'
