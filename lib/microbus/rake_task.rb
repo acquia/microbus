@@ -132,14 +132,15 @@ module Microbus
                 ' --jobs 1' \
                 ' --standalone' \
                 ' --binstubs binstubs' 
-                
-              cmd2.6 = 
+              
+              # Options deprecated in newer bundler version
+              cmd26 = 
                 ' --path vendor/bundle' \
                 ' --without development' \
                 ' --clean' \
                 ' --frozen' 
               
-              cmd << cmd2.6 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.2')
+              cmd << cmd26 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.2')
               
               cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
