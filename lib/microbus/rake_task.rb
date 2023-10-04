@@ -119,18 +119,28 @@ module Microbus
             # running in docker if need be.
             # @todo When https://github.com/bundler/bundler/issues/4144
             # is released, --jobs can be increased.
-            sh("bundle config set clean 'true'")
-            sh("bundle config set frozen 'true'")
-            sh("bundle config set path 'vendor/bundle'")
-            sh("bundle config set without 'development'")
+            if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
+              sh("bundle config set clean 'true'")
+              sh("bundle config set frozen 'true'")
+              sh("bundle config set path 'vendor/bundle'")
+              sh("bundle config set without 'development'")
+            end
             
             begin
               cmd =
                 'bundle install' \
                 ' --jobs 1' \
                 ' --standalone' \
-                ' --binstubs binstubs'
-
+                ' --binstubs binstubs' 
+                
+              cmd2.6 = 
+                ' --path vendor/bundle' \
+                ' --without development' \
+                ' --clean' \
+                ' --frozen' 
+              
+              cmd << cmd2.6 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.2')
+              
               cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
               cmd << ' && ruby minimize.rb' if opts.minimize
@@ -138,10 +148,12 @@ module Microbus
 
               docker.run(cmd)
             ensure
-              sh("bundle config --delete clean")
-              sh("bundle config --delete frozen")
-              sh("bundle config --delete path")
-              sh("bundle config --delete without")
+              if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
+                sh("bundle config --delete clean")
+                sh("bundle config --delete frozen")
+                sh("bundle config --delete path")
+                sh("bundle config --delete without")
+              end
             end
           end
         end
