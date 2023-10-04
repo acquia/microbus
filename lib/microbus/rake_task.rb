@@ -119,7 +119,7 @@ module Microbus
             # running in docker if need be.
             # @todo When https://github.com/bundler/bundler/issues/4144
             # is released, --jobs can be increased.
-            if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
+            if Gem::Version.new(ENV['BUNDLER_VERSION']) >= Gem::Version.new('2.1.4')
               sh("bundle config set clean 'true'")
               sh("bundle config set frozen 'true'")
               sh("bundle config set path 'vendor/bundle'")
@@ -140,7 +140,7 @@ module Microbus
                 ' --clean' \
                 ' --frozen' 
               
-              cmd << cmd26 if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.2')
+              cmd << cmd26 if Gem::Version.new(ENV['BUNDLER_VERSION']) < Gem::Version.new('2.1.4')
               
               cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
@@ -149,7 +149,7 @@ module Microbus
 
               docker.run(cmd)
             ensure
-              if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
+              if Gem::Version.new(ENV['BUNDLER_VERSION']) >= Gem::Version.new('2.1.4')
                 sh("bundle config --delete clean")
                 sh("bundle config --delete frozen")
                 sh("bundle config --delete path")
