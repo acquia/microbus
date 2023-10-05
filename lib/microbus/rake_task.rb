@@ -10,7 +10,7 @@ require_relative 'packager'
 module Microbus
   # Provides a custom rake task.
   class RakeTask < Rake::TaskLib # rubocop:disable Metrics/ClassLength
-    Options = Struct.new(:arch, :build_path, :checksum, :deployment_path,
+    Options = Struct.new(:arch, :build_path, :checksum, :deployment_path, :docker_args,
                          :docker_path, :docker_cache, :docker_image, :filename,
                          :files, :fpm_options, :gem_helper, :minimize, :name,
                          :smoke_test_cmd, :type, :version, :binstub_shebang,
@@ -25,6 +25,7 @@ module Microbus
           o.version = gem_helper.gemspec.version
           o.build_path = "#{gem_helper.base}/build"
           o.deployment_path = "/opt/#{o.name}"
+          o.docker_args = []
           o.docker_path = "#{gem_helper.base}/docker"
           o.docker_image = "local/#{o.name}-builder"
           o.filename = ENV['OUTPUT_FILE']
@@ -77,7 +78,8 @@ module Microbus
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache,
           gid: opts.gid,
-          uid: opts.uid
+          uid: opts.uid,
+          docker_args: opts.docker_args
         )
         docker.prepare
         puts "Detected Architecture: #{docker.architecture(opts.type)}"
@@ -85,7 +87,7 @@ module Microbus
       end
     end
 
-    def declare_build_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    def declare_build_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       desc "Build #{@gem_helper.gemspec.name} tarball"
       task :build do # rubocop:disable Metrics/BlockLength
         Rake::Task["#{@name}:clean"].invoke(false)
@@ -102,13 +104,14 @@ module Microbus
           local_dir: opts.build_path,
           cache_dir: opts.docker_cache,
           gid: opts.gid,
-          uid: opts.uid
+          uid: opts.uid,
+          docker_args: opts.docker_args
         )
 
         docker.prepare
 
-        Dir.chdir(opts.build_path) do
-          Bundler.with_clean_env do
+        Dir.chdir(opts.build_path) do # rubocop:disable Metrics/BlockLength
+          Bundler.with_clean_env do # rubocop:disable Metrics/BlockLength
             bundle_package
 
             # @note don't use --deployment because bundler may package OS
@@ -116,22 +119,43 @@ module Microbus
             # running in docker if need be.
             # @todo When https://github.com/bundler/bundler/issues/4144
             # is released, --jobs can be increased.
-            cmd =
-              'bundle install' \
-              ' --jobs 1' \
-              ' --path vendor/bundle' \
-              ' --standalone' \
-              ' --binstubs binstubs' \
-              ' --without development' \
-              ' --clean' \
-              ' --frozen'
+            if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
+              sh('bundle config set clean "true"')
+              sh('bundle config set frozen "true"')
+              sh('bundle config set path "vendor/bundle"')
+              sh('bundle config set without "development"')
+            end
 
-            cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
+            begin
+              cmd =
+                'bundle install' \
+                ' --jobs 1' \
+                ' --standalone' \
+                ' --binstubs binstubs'
 
-            cmd << ' && ruby minimize.rb' if opts.minimize
-            cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
+              # Options deprecated in newer bundler version
+              cmd_old =
+                ' --path vendor/bundle' \
+                ' --without development' \
+                ' --clean' \
+                ' --frozen'
 
-            docker.run(cmd)
+              cmd << cmd_old if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.2')
+
+              cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
+
+              cmd << ' && ruby minimize.rb' if opts.minimize
+              cmd << " && binstubs/#{opts.smoke_test_cmd}" if opts.smoke_test_cmd
+
+              docker.run(cmd)
+            ensure
+              if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
+                sh('bundle config --delete clean')
+                sh('bundle config --delete frozen')
+                sh('bundle config --delete path')
+                sh('bundle config --delete without')
+              end
+            end
           end
         end
 
