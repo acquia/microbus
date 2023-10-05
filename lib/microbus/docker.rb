@@ -7,7 +7,7 @@ module Microbus
 
     # rubocop:disable Metrics/ParameterLists
     def initialize(path:, tag:, work_dir:, local_dir:, cache_dir: nil,
-                   gid: Process::Sys.getegid, uid: Process::Sys.geteuid, docker_args:)
+                   gid: Process::Sys.getegid, uid: Process::Sys.geteuid, docker_args: '')
       @path = path
       @tag = tag
       @work_dir = work_dir

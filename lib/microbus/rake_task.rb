@@ -87,7 +87,7 @@ module Microbus
       end
     end
 
-    def declare_build_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    def declare_build_task # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
       desc "Build #{@gem_helper.gemspec.name} tarball"
       task :build do # rubocop:disable Metrics/BlockLength
         Rake::Task["#{@name}:clean"].invoke(false)
@@ -110,8 +110,8 @@ module Microbus
 
         docker.prepare
 
-        Dir.chdir(opts.build_path) do
-          Bundler.with_clean_env do
+        Dir.chdir(opts.build_path) do # rubocop:disable Metrics/BlockLength
+          Bundler.with_clean_env do # rubocop:disable Metrics/BlockLength
             bundle_package
 
             # @note don't use --deployment because bundler may package OS
@@ -120,28 +120,28 @@ module Microbus
             # @todo When https://github.com/bundler/bundler/issues/4144
             # is released, --jobs can be increased.
             if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
-              sh("bundle config set clean 'true'")
-              sh("bundle config set frozen 'true'")
-              sh("bundle config set path 'vendor/bundle'")
-              sh("bundle config set without 'development'")
+              sh('bundle config set clean "true"')
+              sh('bundle config set frozen "true"')
+              sh('bundle config set path "vendor/bundle"')
+              sh('bundle config set without "development"')
             end
-            
+
             begin
               cmd =
                 'bundle install' \
                 ' --jobs 1' \
                 ' --standalone' \
-                ' --binstubs binstubs' 
-              
+                ' --binstubs binstubs'
+
               # Options deprecated in newer bundler version
-              cmd_old = 
+              cmd_old =
                 ' --path vendor/bundle' \
                 ' --without development' \
                 ' --clean' \
-                ' --frozen' 
-              
+                ' --frozen'
+
               cmd << cmd_old if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1.2')
-              
+
               cmd << " --shebang #{opts.binstub_shebang}" if opts.binstub_shebang
 
               cmd << ' && ruby minimize.rb' if opts.minimize
@@ -150,10 +150,10 @@ module Microbus
               docker.run(cmd)
             ensure
               if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1.2')
-                sh("bundle config --delete clean")
-                sh("bundle config --delete frozen")
-                sh("bundle config --delete path")
-                sh("bundle config --delete without")
+                sh('bundle config --delete clean')
+                sh('bundle config --delete frozen')
+                sh('bundle config --delete path')
+                sh('bundle config --delete without')
               end
             end
           end
