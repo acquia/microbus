@@ -18,6 +18,7 @@ module Microbus
       class << self
         private :new
         # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+        # rubocop:disable Style/SafeNavigation
         def create(gem_helper, block = nil)
           o = new
           # Set defaults.
@@ -44,6 +45,7 @@ module Microbus
           o.freeze
         end
         # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
+        # rubocop:enable Style/SafeNavigation
       end
     end
 
