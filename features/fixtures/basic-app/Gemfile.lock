@@ -41,7 +41,7 @@ GEM
       mustache (= 0.99.8)
       stud
     rake (13.1.0)
-    rexml (3.2.6)
+    rexml (3.3.9)
     sequel (5.78.0)
       bigdecimal
     stud (0.0.23)
